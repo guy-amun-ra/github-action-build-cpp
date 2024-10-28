@@ -37,9 +37,15 @@ jobs:
 
     - name: Get the version
       id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        elif [[ $GITHUB_REF == refs/heads/* ]]; then
+          echo "VERSION=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_OUTPUT
+        fi
 
     - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -51,6 +57,7 @@ jobs:
         prerelease: false
 
     - name: Upload Release Asset
+      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
