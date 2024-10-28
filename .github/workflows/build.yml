@@ -16,7 +16,7 @@ jobs:
         cmake ..
         make
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: hello-world-executable
         path: build/hello
